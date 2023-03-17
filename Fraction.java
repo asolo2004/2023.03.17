@@ -1,3 +1,6 @@
+import java.util.Arrays;
+import java.util.Stack;
+
 public class Fraction {
     private int numerator;
     private int denominator;
@@ -226,5 +229,126 @@ public class Fraction {
         int tempNumerator = fraction1.numerator * fraction2.denominator;
         return new Fraction(tempNumerator, tempDenominator);
 
+    }
+
+    public static Fraction count(String str) {
+        Stack<Fraction> fractionStack = new Stack<>();
+        Stack<String> symbolStack = new Stack<>();
+        String[] expression = toReadForm(str);
+        String[] temp = new String[2];
+        Fraction tempFrac1 = new Fraction();
+        Fraction tempFrac2 = new Fraction();
+
+        for (int i = 0; i < expression.length; i++) {
+
+
+            if (expression[i].length() > 1) {
+                temp = expression[i].split("/");
+                fractionStack.push(new Fraction(Integer.parseInt(temp[0]), Integer.parseInt(temp[1])));
+            } else if ((expression[i].equals("(")) || (symbolStack.empty())) {
+                symbolStack.push(expression[i]);
+            } else if ((symbolStack.peek().equals("(")) && (expression[i].equals(")"))) {
+                symbolStack.pop();
+            } else if (symbolStack.peek().equals("(")) {
+                symbolStack.push(expression[i]);
+            } else if (expression[i].equals(")")) {
+                while (!symbolStack.peek().equals("(")) {
+                    tempFrac1 = fractionStack.peek();
+                    fractionStack.pop();
+                    tempFrac2 = fractionStack.peek();
+                    fractionStack.pop();
+                    fractionStack.push(stringCount(symbolStack.peek(), tempFrac1, tempFrac2));
+                    symbolStack.pop();
+                }
+                symbolStack.pop();
+
+            } else if (priority(symbolStack.peek(), expression[i])) {
+                symbolStack.push(expression[i]);
+            } else if (!priority(symbolStack.peek(), expression[i])) {
+                tempFrac1 = fractionStack.peek();
+                fractionStack.pop();
+                tempFrac2 = fractionStack.peek();
+                fractionStack.pop();
+                fractionStack.push(stringCount(symbolStack.peek(), tempFrac1, tempFrac2));
+                symbolStack.pop();
+                symbolStack.push(expression[i]);
+            }
+        }
+
+        while (!symbolStack.empty()) {
+            tempFrac1 = fractionStack.peek();
+            fractionStack.pop();
+            tempFrac2 = fractionStack.peek();
+            fractionStack.pop();
+            fractionStack.push(stringCount(symbolStack.peek(), tempFrac1, tempFrac2));
+            symbolStack.pop();
+        }
+        return fractionStack.peek();
+
+    }
+
+    private static String[] toReadForm(String str) {
+
+        String[] tempExpression = new String[str.length()];
+        int i, curNum = 0;
+        String tempString = "";
+        str = str.replaceAll("\\s", "");
+        String[] arrayString = str.split("");
+        for (i = 0; i < str.length(); i++) {
+            if ((arrayString[i].equals("+")) || (arrayString[i].equals("*")) || (arrayString[i].equals("(")) || (arrayString[i].equals(")")) || (arrayString[i].equals(":"))) {
+                if (tempString.length() != 0) {
+                    tempExpression[curNum] = tempString;
+                    curNum += 1;
+                    tempString = "";
+                }
+                tempExpression[curNum] = arrayString[i];
+                curNum += 1;
+            } else if (i == 0) {
+                tempString += arrayString[i];
+            } else if ((arrayString[i].equals("-")) && ((arrayString[i - 1]).equals("(")) || ((arrayString[i - 1]).equals(")")) && (arrayString[i + 1]).equals("\\d")) {
+                tempString += arrayString[i];
+            } else if (arrayString[i].equals("-") && (arrayString[i - 1]).equals("/")) {
+                tempString += arrayString[i];
+            } else if (arrayString[i].equals("-")) {
+                if (tempString.length() != 0) {
+                    tempExpression[curNum] = tempString;
+                    curNum += 1;
+                    tempString = "";
+                }
+                tempExpression[curNum] = arrayString[i];
+                curNum += 1;
+            } else {
+                tempString += arrayString[i];
+            }
+
+        }
+        if (tempString.length() != 0) {
+            tempExpression[curNum] = tempString;
+            curNum += 1;
+        }
+        return Arrays.copyOfRange(tempExpression, 0, curNum);
+    }
+
+    private static boolean priority(String str1, String str2) {
+        if ((str1.equals("-") || str1.equals("+")) && ((str2.equals("*")) || (str2.equals(":")))) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private static Fraction stringCount(String str, Fraction frac2, Fraction frac1) {
+        switch (str.toCharArray()[0]) {
+            case ':':
+                return Fraction.div(frac1, frac2);
+            case '-':
+                return Fraction.sub(frac2, frac1);
+            case '*':
+                return Fraction.mul(frac1, frac2);
+            case '+':
+                return Fraction.sum(frac1, frac2);
+            default:
+                return frac1;
+        }
     }
 }
