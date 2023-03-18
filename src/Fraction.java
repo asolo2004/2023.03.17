@@ -1,5 +1,7 @@
 import java.util.Arrays;
 import java.util.Stack;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Fraction {
     private int numerator;
@@ -12,12 +14,12 @@ public class Fraction {
     public int getDenominator() {
         return this.denominator;
     }
-
-    public String getFraction() {
+    @Override
+    public String toString() {
         return this.numerator + "/" + this.denominator;
     }
 
-    public Fraction(int numerator, int denominator) throws NumberFormatException {
+    public Fraction(int numerator, int denominator){
         if (denominator != 0) {
             if (denominator < 0) {
                 numerator = -numerator;
@@ -25,7 +27,7 @@ public class Fraction {
             }
             reduction(numerator, denominator);
         } else {
-            exp();
+            throw new ArithmeticException();
         }
     }
 
@@ -57,146 +59,6 @@ public class Fraction {
             this.numerator = 0;
             this.denominator = 1;
         }
-    }
-
-    public void sum(int numerator1, int denominator1) throws NumberFormatException {
-        if (denominator1 != 0) {
-            if (denominator1 < 0) {
-                numerator1 = -numerator1;
-                denominator1 = -denominator1;
-            }
-            int tempDenominator = getNok(denominator1, this.denominator);
-            int tempNumerator = (tempDenominator / denominator1) * numerator1 + (tempDenominator / this.denominator) * this.numerator;
-            reduction(tempNumerator, tempDenominator);
-        } else {
-            exp();
-        }
-
-    }
-
-    public void sum(int numerator1, int denominator1, int numerator2, int denominator2) throws NumberFormatException {
-        if (denominator1 != 0 & denominator2 != 0) {
-            if (denominator1 < 0) {
-                numerator1 = -numerator1;
-                denominator1 = -denominator1;
-            }
-            if (denominator2 < 0) {
-                numerator2 = -numerator2;
-                denominator2 = -denominator2;
-            }
-            int tempDenominator = getNok(denominator1, denominator2);
-            int tempNumerator = (tempDenominator / denominator1) * numerator1 + (tempDenominator / denominator2) * numerator2;
-            reduction(tempNumerator, tempDenominator);
-        } else {
-            exp();
-        }
-
-    }
-
-    public void sub(int numerator1, int denominator1) throws NumberFormatException {
-        if (denominator1 != 0) {
-            if (denominator1 < 0) {
-                numerator1 = -numerator1;
-                denominator1 = -denominator1;
-            }
-            int tempDenominator = getNok(denominator1, this.denominator);
-            int tempNumerator = -((tempDenominator / denominator1) * numerator1) + (tempDenominator / this.denominator) * this.numerator;
-            reduction(tempNumerator, tempDenominator);
-        } else {
-            exp();
-        }
-
-    }
-
-    public void sub(int numerator1, int denominator1, int numerator2, int denominator2) throws NumberFormatException {
-        if (denominator1 != 0 & denominator2 != 0) {
-            if (denominator1 < 0) {
-                numerator1 = -numerator1;
-                denominator1 = -denominator1;
-            }
-            if (denominator2 < 0) {
-                numerator2 = -numerator2;
-                denominator2 = -denominator2;
-            }
-            int tempDenominator = getNok(denominator1, denominator2);
-            int tempNumerator = (tempDenominator / denominator1) * numerator1 - (tempDenominator / denominator2) * numerator2;
-            reduction(tempNumerator, tempDenominator);
-        } else {
-            exp();
-        }
-
-    }
-
-    public void mul(int numerator1, int denominator1) throws NumberFormatException {
-        if (denominator1 != 0) {
-            if (denominator1 < 0) {
-                numerator1 = -numerator1;
-                denominator1 = -denominator1;
-            }
-            int tempDenominator = denominator1 * this.denominator;
-            int tempNumerator = numerator1 * this.numerator;
-            reduction(tempNumerator, tempDenominator);
-        } else {
-            exp();
-        }
-
-    }
-
-    public void mul(int numerator1, int denominator1, int numerator2, int denominator2) throws NumberFormatException {
-        if (denominator1 != 0 & denominator2 != 0) {
-            if (denominator1 < 0) {
-                numerator1 = -numerator1;
-                denominator1 = -denominator1;
-            }
-            if (denominator2 < 0) {
-                numerator2 = -numerator2;
-                denominator2 = -denominator2;
-            }
-            int tempDenominator = denominator1 * denominator2;
-            int tempNumerator = numerator1 * numerator2;
-            reduction(tempNumerator, tempDenominator);
-        } else {
-            exp();
-        }
-
-    }
-
-    public void div(int numerator1, int denominator1) throws NumberFormatException {
-        if (denominator1 != 0) {
-            if (numerator1 < 0) {
-                numerator1 = -numerator1;
-                denominator1 = -denominator1;
-            }
-            int tempDenominator = numerator1 * this.denominator;
-            int tempNumerator = denominator1 * this.numerator;
-            reduction(tempNumerator, tempDenominator);
-        } else {
-            exp();
-        }
-
-    }
-
-    public void div(int numerator1, int denominator1, int numerator2, int denominator2) throws NumberFormatException {
-        if (denominator1 != 0 & denominator2 != 0) {
-            if (denominator1 < 0) {
-                numerator1 = -numerator1;
-                denominator1 = -denominator1;
-            }
-            if (numerator2 < 0) {
-                numerator2 = -numerator2;
-                denominator2 = -denominator2;
-            }
-            int tempDenominator = denominator1 * numerator2;
-            int tempNumerator = numerator1 * denominator2;
-            reduction(tempNumerator, tempDenominator);
-        } else {
-            exp();
-        }
-
-    }
-
-    private void exp() throws NumberFormatException {
-        throw new NumberFormatException("о в знаменателе");
     }
 
     public static Fraction sum(Fraction fraction1, Fraction fraction2) {
@@ -231,20 +93,21 @@ public class Fraction {
 
     }
 
-    public static Fraction count(String str) {
+    public static Fraction calculate(String str) {
         Stack<Fraction> fractionStack = new Stack<>();
         Stack<String> symbolStack = new Stack<>();
         String[] expression = toReadForm(str);
-        String[] temp = new String[2];
-        Fraction tempFrac1 = new Fraction();
-        Fraction tempFrac2 = new Fraction();
-
+        String[] temp;
+        Fraction tempFrac1;
+        Fraction tempFrac2;
+        Pattern patternFraction = Pattern.compile("^(-?\\d+)/(-?\\d+)$");
         for (int i = 0; i < expression.length; i++) {
 
 
             if (expression[i].length() > 1) {
-                temp = expression[i].split("/");
-                fractionStack.push(new Fraction(Integer.parseInt(temp[0]), Integer.parseInt(temp[1])));
+                Matcher m = patternFraction.matcher(expression[i]);
+                m.find();
+                fractionStack.push(new Fraction(Integer.parseInt(m.group(1)), Integer.parseInt(m.group(2))));
             } else if ((expression[i].equals("(")) || (symbolStack.empty())) {
                 symbolStack.push(expression[i]);
             } else if ((symbolStack.peek().equals("(")) && (expression[i].equals(")"))) {
@@ -305,7 +168,7 @@ public class Fraction {
                 curNum += 1;
             } else if (i == 0) {
                 tempString += arrayString[i];
-            } else if ((arrayString[i].equals("-")) && ((arrayString[i - 1]).equals("(")) || ((arrayString[i - 1]).equals(")")) && (arrayString[i + 1]).equals("\\d")) {
+            } else if ((arrayString[i].equals("-")) && (arrayString[i - 1].equals("("))) {
                 tempString += arrayString[i];
             } else if (arrayString[i].equals("-") && (arrayString[i - 1]).equals("/")) {
                 tempString += arrayString[i];
